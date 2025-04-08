@@ -7,16 +7,17 @@ li a5 5         # tamano pala
 li a6 0x000000  # color negro
 li s0 1         # posicion pala izquierda
 li s1 0         # posicion pala derecha
-li s5 1         # dx
-li s6 -1        # dy
+li s4 1         # dx
+li s5 -1        # dy
 
 loop_juego:
     jal posiciones_iniciales
+    jal dibuja_bola
     jal dibuja_pala
 
 posiciones_iniciales:
-    mul t0, a1, a2
-    slli s3, t0, 1
+    srli s2, a1, 1  # x
+    srli s3, a2, 1  # y
     ret
 
 actualiza_pala:
@@ -33,7 +34,6 @@ actualiza_pala:
     li t2, 4            # byte
     mul t3, a1, t2      # bytes por fila
     
-    addi t1, s0, 4
     mul t4, t1, t3      # offset actual
     add t0, t0, t4      # agrega offset
 
@@ -75,9 +75,7 @@ boton_izquierda:
     bge t2, t3, boton_derecha   # verifica limite inferior
 
     add t0, zero, a0    # direccion base
-    li t2, 4            # byte
-    mul t3, a1, t2      # bytes por fila
-    
+    li t2, 4            # bytes2,
     mul t4, s1, t3      # offset actual
     sub t4, t4, t2
     add t0, t0, t4      # agrega offset
@@ -111,8 +109,6 @@ boton_derecha:
 
 
 dibuja_pala:
-    add t0, zero, a0    # direccion base
-    add t5, zero, a0
     li t1, 1            # contador
     li t2, 4            # byte
     mul t3, a1, t2      # bytes por fila
@@ -121,8 +117,8 @@ dibuja_pala:
     mul t6, s1, t3      # offset actual pala derecha
     sub t6, t6, t2
 
-    add t0, t0, t4      # agrega offset
-    add t5, t5, t6
+    add t0, a0, t4      # agrega offset
+    add t5, a0, t6
 
     sw a4, 0(t0)        # color
     sw a4, 0(t5)
@@ -134,5 +130,30 @@ dibuja_pala_loop:
     sw a4, 0(t0)        # color 
     sw a4, 0(t5)        # color 
     bne t1, a5, dibuja_pala_loop
-    beq t1, a5, actualiza_pala
+    beq t1, a5, borra_bola
+
+borra_bola:
+    jal selecciona_bola
+    sw a6, 0(t0)
+    jal actualiza_bola
+    
+actualiza_bola:
+    add s2, s2, s4
+    add s3, s3, s5
+
+dibuja_bola:
+    jal selecciona_bola
+    sw a4, 0(t0)
+    jal actualiza_pala
+
+selecciona_bola:
+    li t2, 4
+    mul t0, a1, s3      # pixels before the ball's row
+    mul t0, t0, t2      # bytes
+    mul t1, s2, t2      # pixels of the ball's column
+
+    add t0, t0, a0      # add base address
+    add t0, t0, t1      # add column offset
+
+    ret
 
