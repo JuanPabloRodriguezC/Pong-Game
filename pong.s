@@ -5,10 +5,12 @@ li a3 D_PAD_0_BASE
 li a4 0xffffff
 li a5 5         # tamano pala
 li a6 0x000000  # color negro
-li s0 1         # posicion pala izquierda
-li s1 0         # posicion pala derecha
-li s4 1         # dx
-li s5 -1        # dy
+li s0 0         # x-pala izquierda
+li s1 0         # y-pala izquierda
+add s2, a1, 0   # x-pala derecha
+li s3, 0        # y-pala derecha
+li s6 1         # dx
+li s7 -1        # dy
 
 loop_juego:
     jal posiciones_iniciales
@@ -16,8 +18,8 @@ loop_juego:
     jal dibuja_pala
 
 posiciones_iniciales:
-    srli s2, a1, 1  # x
-    srli s3, a2, 1  # y
+    srli s4, a1, 1  # x
+    srli s5, a2, 1  # y
     ret
 
 actualiza_pala:
