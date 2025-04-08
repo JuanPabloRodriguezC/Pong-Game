@@ -21,21 +21,20 @@ posiciones_iniciales:
     ret
 
 actualiza_pala:
+    li t4, 4            # byte
+    mul t2, a1, t4      # bytes por fila
+
     # verifica si boton de arriba se presiona
     lw t1, 0(a3)
     andi t1, t1, 1
     beqz t1, boton_abajo
     
     # boton de arriba presionado
-    addi t2, s0, 0
-    beqz t2, boton_abajo    # verifica limite superior
-
-    add t0, zero, a0    # direccion base
-    li t2, 4            # byte
-    mul t3, a1, t2      # bytes por fila
+    beqz s0, boton_abajo    # verifica limite superior
     
-    mul t4, t1, t3      # offset actual
-    add t0, t0, t4      # agrega offset
+    
+    mul t3, s0, t2      # offset actual
+    add t0, a0, t3      # agrega offset a direcion base
 
     sw a6, 0(t0)        # color
 
@@ -48,37 +47,28 @@ boton_abajo:
     beqz t1, boton_izquierda
     
     # boton de abajo presionado
-    addi t2, s0, 0
     sub t3, a2, a5
-    bge t2, t3, boton_izquierda   # verifica limite inferior
-
-    add t0, zero, a0    # direccion base
-    li t2, 4            # byte
-    mul t3, a1, t2      # bytes por fila
+    bge s0, t3, boton_izquierda   # verifica limite inferior
     
-    mul t4, s0, t3      # offset actual
-    add t0, t0, t4      # agrega offset
+    mul t3, s0, t2      # offset actual
+    add t0, a0, t3      # agrega offset
 
     sw a6, 0(t0)        # color
 
     addi s0, s0, 1
 
 boton_izquierda:
-    # verifica boton de abajo presionado
+    # verifica boton de arriba presionado
     lw t1, 8(a3)
     andi t1, t1, 1
     beqz t1, boton_derecha
     
-    # boton de abajo presionado
-    addi t2, s1, 0
-    sub t3, a2, a5
-    bge t2, t3, boton_derecha   # verifica limite inferior
+    # boton de arriba presionado
+    bqez s1, boton_derecha   # verifica limite inferior
 
-    add t0, zero, a0    # direccion base
-    li t2, 4            # bytes2,
-    mul t4, s1, t3      # offset actual
-    sub t4, t4, t2
-    add t0, t0, t4      # agrega offset
+    mul t3, s1, t2      # offset actual
+    sub t3, t3, t4      # un byte atras
+    add t0, a0, t3      # agrega offset
 
     sw a6, 0(t0)        # color
 
@@ -91,17 +81,12 @@ boton_derecha:
     beqz t1, dibuja_pala
     
     # boton de abajo presionado
-    addi t2, s0, 0
     sub t3, a2, a5
-    bge t2, t3, dibuja_pala   # verifica limite inferior
+    bge s1, t3, dibuja_pala   # verifica limite inferior
 
-    add t0, zero, a0    # direccion base
-    li t2, 4            # byte
-    mul t3, a1, t2      # bytes por fila
-    
-    mul t4, s1, t3      # offset actual pala izquierda
-    sub t4, t4, t2      #
-    add t0, t0, t4      # agrega offset
+    mul t3, s1, t2      # offset actual pala izquierda
+    sub t3, t3, t4      #
+    add t0, a0, t3      # agrega offset a la base de direccion
 
     sw a6, 0(t0)        # color
 
@@ -115,8 +100,7 @@ dibuja_pala:
     
     mul t4, s0, t3      # offset actual pala izquierda
     mul t6, s1, t3      # offset actual pala derecha
-    sub t6, t6, t2
-
+    sub t6, t6, t2      
     add t0, a0, t4      # agrega offset
     add t5, a0, t6
 
@@ -146,12 +130,11 @@ dibuja_bola:
     sw a4, 0(t0)
     jal actualiza_pala
 
-selecciona_bola:
+selecciona_pixel:
     li t2, 4
     mul t0, a1, s3      # pixels before the ball's row
     mul t0, t0, t2      # bytes
     mul t1, s2, t2      # pixels of the ball's column
-
     add t0, t0, a0      # add base address
     add t0, t0, t1      # add column offset
 
