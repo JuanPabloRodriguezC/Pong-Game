@@ -8,7 +8,7 @@ li s7 0                             # y-pala izquierda
 addi s8, s1, -1                     # x-pala derecha
 li s9, 0                            # y-pala derecha
 li s10 1                            # dx
-li s11 -1                           # dy
+li s11 0                            # dy
 li a7 5
 
 loop_juego:
@@ -24,8 +24,10 @@ variables_iniciales:
     # constantes
     li t4, 4            # byte
     mul t2, s1, t4      # bytes por fila
-    li a5, 0xffffff
-    li a6, 0x000000
+    li a3, 0            # puntaje izquierda
+    li a4, 0            # puntaje derecha
+    li a5, 0xc2fc03     # color blanco
+    li a6, 0x000000     # color negro
 
     ret
 
@@ -142,7 +144,7 @@ dibuja_bola:
     add a1, zero, s5
     jal selecciona_pixel
     sw a5, 0(t0)
-    jal actualiza_pala
+    jal verifica_colision
 
 selecciona_pixel:
     mul t0, t4, a0
@@ -151,3 +153,44 @@ selecciona_pixel:
     add t0, t0, s0
     ret
 
+verifica_colision:
+    addi t0, s8, -1
+    beq s4, t0, choque_pala_derecha
+
+    addi t0, s6, 1
+    beq s4, t0, choque_pala_izquierda
+    jal actualiza_pala
+
+choque_pala_izquierda:
+    add t0, s7, a7
+    
+    bge s5, t0, punto_der       # abajo de la pala
+    blt s5, s7, punto_der       # arriba de la pala
+    bge s5, s7, rebota_x      # en la pala
+
+    jal actualiza_pala
+
+choque_pala_derecha:
+    add t0, s9, a7
+
+    bge s5, t0, punto_izq       # abajo de la pala
+    blt s5, s9, punto_izq       # arriba de la pala
+    bge s5, s9, rebota_x      # en la pala
+
+    jal actualiza_pala
+
+
+punto_izq:
+    addi a3, a3, 1
+
+    jal actualiza_pala
+    
+
+punto_der:
+    addi a4, a4, 1
+    jal actualiza_pala
+
+rebota_x:
+    addi t0, zero, -1
+    mul s10, s10, t0
+    jal actualiza_pala
