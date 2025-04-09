@@ -8,7 +8,7 @@ li s7 0                             # y-pala izquierda
 addi s8, s1, -1                     # x-pala derecha
 li s9, 0                            # y-pala derecha
 li s10 1                            # dx
-li s11 0                            # dy
+li s11 -1                            # dy
 li a7 5
 
 loop_juego:
@@ -144,7 +144,7 @@ dibuja_bola:
     add a1, zero, s5
     jal selecciona_pixel
     sw a5, 0(t0)
-    jal verifica_colision
+    jal verifica_colision_vertical
 
 selecciona_pixel:
     mul t0, t4, a0
@@ -153,12 +153,22 @@ selecciona_pixel:
     add t0, t0, s0
     ret
 
-verifica_colision:
+verifica_colision_vertical:
+    beqz s5, rebota_y
+
+    addi t0, s2, -1
+    bge s5, t0, rebota_y
+
+verifica_colision_horizontal:
+    addi t0, s8, -1
+    beq s4, t0, choque_pala_derecha
+
     addi t0, s8, -1
     beq s4, t0, choque_pala_derecha
 
     addi t0, s6, 1
     beq s4, t0, choque_pala_izquierda
+
     jal actualiza_pala
 
 choque_pala_izquierda:
@@ -166,7 +176,7 @@ choque_pala_izquierda:
     
     bge s5, t0, punto_der       # abajo de la pala
     blt s5, s7, punto_der       # arriba de la pala
-    bge s5, s7, rebota_x      # en la pala
+    jal rebota_x      # en la pala
 
     jal actualiza_pala
 
@@ -175,7 +185,7 @@ choque_pala_derecha:
 
     bge s5, t0, punto_izq       # abajo de la pala
     blt s5, s9, punto_izq       # arriba de la pala
-    bge s5, s9, rebota_x      # en la pala
+    jal rebota_x      # en la pala
 
     jal actualiza_pala
 
@@ -184,7 +194,6 @@ punto_izq:
     addi a3, a3, 1
 
     jal actualiza_pala
-    
 
 punto_der:
     addi a4, a4, 1
@@ -193,4 +202,9 @@ punto_der:
 rebota_x:
     addi t0, zero, -1
     mul s10, s10, t0
-    jal actualiza_pala
+    ret 
+
+rebota_y:
+    addi t0, zero, -1
+    mul s11, s11, t0
+    jal verifica_colision_horizontal 
