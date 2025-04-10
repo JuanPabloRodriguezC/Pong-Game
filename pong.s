@@ -26,6 +26,17 @@ loop_juego:
     jal ra, actualiza_pala
     jal ra, actualiza_bola
     jal ra, verifica_colisiones
+
+    # Guarda ra antes de llamar a delay
+    addi sp, sp, -4
+    sw ra, 0(sp)
+    
+    jal ra, delay         # Llama a la función de delay
+    
+    # Restaura ra
+    lw ra, 0(sp)
+    addi sp, sp, 4
+
     j loop_juego
 
 actualiza_pala:
@@ -226,3 +237,12 @@ rebota_y:
     addi t0, zero, -1
     mul s11, s11, t0
     jal ra, verifica_colision_horizontal
+
+delay:
+    li t0, 0              # Inicializa contador
+    li t1, 2000         # Cantidad de iteraciones para el delay (ajusta según necesidad)
+    
+delay_loop:
+    addi t0, t0, 1        # Incrementa contador
+    blt t0, t1, delay_loop # Continúa el bucle si no ha llegado al límite
+    ret
