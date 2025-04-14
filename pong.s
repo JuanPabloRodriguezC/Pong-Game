@@ -217,13 +217,27 @@ selecciona_pixel:
     ret
 
 punto_izq:
+    # borra pixel anterior
+    add a0, zero, s4
+    add a1, zero, s5
+    jal selecciona_pixel
+    sw a6, 0(t0)
     addi a3, a3, 1
+    srli s4, s1, 1                      # x
+    srli s5, s2, 1 
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
 
 punto_der:
+    # borra pixel anterior
+    add a0, zero, s4
+    add a1, zero, s5
+    jal selecciona_pixel
+    sw a6, 0(t0)
     addi a4, a4, 1
+    srli s4, s1, 1                      # x
+    srli s5, s2, 1 
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
@@ -237,6 +251,7 @@ rebota_y:
     addi t0, zero, -1
     mul s11, s11, t0
     jal ra, verifica_colision_horizontal
+    
 
 delay:
     li t0, 0              # Inicializa contador
