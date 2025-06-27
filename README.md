@@ -1,5 +1,5 @@
 # Pong-Game
-Manula de usuario:
+Manual de usuario:
 
 1. Dirígase a la página https://ripes.me/
 2. Copie y pegue el código del repositorio en la pestña de "Editor".
